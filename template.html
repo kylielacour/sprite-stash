@@ -18,15 +18,6 @@
   --jerry-deep: #134f8f;
   --gold: #ffc531;
   --gold-deep: #9a6a00;
-  --rare: #104273;
-  --epic: #4d1566;
-  --legendary: #743e0a;
-  --mythic: #a89442;
-  --v-gold: #8f6d07;
-  --v-cheat: #1c6a22;
-  --v-hacker: #5a1c9c;
-  --v-reaper: #9b2a9e;
-  --v-treat: #a8480f;
   --font: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
 }
 :root[data-mode="light"] {
@@ -38,15 +29,6 @@
   --line: rgba(0, 0, 0, 0.09);
   --fg: #1d1d1f;
   --muted: #6e6e73;
-  --rare: #7fb5ea;
-  --epic: #c48ee0;
-  --legendary: #f0b07a;
-  --mythic: #e6d488;
-  --v-gold: #ecc955;
-  --v-cheat: #8fd48f;
-  --v-hacker: #b28ef0;
-  --v-reaper: #e597e6;
-  --v-treat: #f2a877;
 }
 :root[data-mode="light"] .seg button[aria-pressed="true"] { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
 :root[data-mode="light"] .card { box-shadow: inset 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.04); }
@@ -126,11 +108,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--jerry); out
 }
 .card:hover { transform: translateY(-2px); }
 .card:active { transform: scale(0.98); }
-.art { aspect-ratio: 1; max-width: 100%; background-image: linear-gradient(color-mix(in srgb, var(--tint) 50%, transparent) 0, transparent 100%); }
+.art { aspect-ratio: 1; max-width: 100%; }
 .art img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.t-rare { --tint: var(--rare); } .t-epic { --tint: var(--epic); } .t-legendary { --tint: var(--legendary); } .t-mythic { --tint: var(--mythic); }
-.t-gold { --tint: var(--v-gold); } .t-cheatmaster { --tint: var(--v-cheat); } .t-hacker { --tint: var(--v-hacker); }
-.t-reaper { --tint: var(--v-reaper); } .t-tricktreat { --tint: var(--v-treat); }
 .info { padding: 6px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
 .nm { font-weight: 600; font-size: 14px; letter-spacing: -0.01em; line-height: 1.25; overflow-wrap: anywhere; }
 .tags { display: flex; gap: 10px; font-size: 12px; color: var(--muted); }
@@ -144,11 +123,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--jerry); out
 .tag.on::before { opacity: 1; border-color: #fff;
   background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px no-repeat; }
 
-.card.own-k { background: linear-gradient(180deg, var(--kylie-deep), var(--kylie)); box-shadow: inset 0 0 0 1.5px var(--kylie); }
-.card.own-j { background: linear-gradient(180deg, var(--jerry-deep), var(--jerry)); box-shadow: inset 0 0 0 1.5px var(--jerry); }
+.card.own-k { background: linear-gradient(180deg, color-mix(in srgb, var(--kylie-deep) 50%, var(--card)), color-mix(in srgb, var(--kylie) 50%, var(--card))); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--kylie) 70%, var(--card)); }
+.card.own-j { background: linear-gradient(180deg, color-mix(in srgb, var(--jerry-deep) 50%, var(--card)), color-mix(in srgb, var(--jerry) 50%, var(--card))); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--jerry) 70%, var(--card)); }
 .card.own-both { background: linear-gradient(180deg, var(--gold-deep), var(--gold)); box-shadow: inset 0 0 0 1.5px var(--gold); }
 .card.own-both .nm, .card.own-both .tag.on { color: #241600; }
 .card.own-k .tag:not(.on), .card.own-j .tag:not(.on) { color: rgba(255, 255, 255, 0.72); }
+:root[data-mode="light"] .card.own-k .tag:not(.on), :root[data-mode="light"] .card.own-j .tag:not(.on) { color: rgba(0, 0, 0, 0.5); }
+:root[data-mode="light"] .card.own-k .tag.on, :root[data-mode="light"] .card.own-j .tag.on { color: var(--fg); }
+:root[data-mode="light"] .card.own-k .tag.on::before, :root[data-mode="light"] .card.own-j .tag.on::before { border-color: var(--fg);
+  background: var(--fg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px no-repeat; }
 .card.own-both .tag:not(.on) { color: rgba(36, 22, 0, 0.6); }
 .card.own-both .tag.on::before { border-color: #241600;
   background: #241600 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23ffc531' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px no-repeat; }
@@ -254,7 +237,6 @@ for (const [id, name, rarity, variant] of SPRITES) {
   b.type = "button";
   b.className = "card";
   b.innerHTML = `<div class="art"><img loading="lazy" decoding="async" alt="" width="160" height="160"></div><div class="info"><div class="nm"></div><div class="tags"><span class="tag k">Mam</span><span class="tag j">Pap</span></div></div>`;
-  b.querySelector(".art").classList.add("t-" + (variant === "base" ? rarity : variant));
   b.querySelector("img").src = "img/" + id + ".webp";
   b.querySelector(".nm").textContent = name;
   b.addEventListener("click", () => tap(id, b));
