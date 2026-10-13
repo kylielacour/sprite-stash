@@ -224,6 +224,7 @@ img { max-width: 100%; }
     </button>
     <select id="show" class="show" aria-label="Show">
       <option value="all">All sprites</option>
+      <option value="none">Neither has</option>
       <option value="k">Only Mam has</option>
       <option value="j">Only Pap has</option>
       <option value="notgold">Not gold yet</option>
@@ -274,7 +275,7 @@ let writing = Promise.resolve();
 try { const saved = localStorage.getItem("sprite-stash-me"); if (saved === "k" || saved === "j") me = saved; } catch (e) {}
 try {
   const saved = localStorage.getItem("sprite-stash-show");
-  if (["all", "k", "j", "notgold"].includes(saved)) show = saved;
+  if (["all", "none", "k", "j", "notgold"].includes(saved)) show = saved;
   else if (localStorage.getItem("sprite-stash-hide") === "1") show = "notgold";
 } catch (e) {}
 let compact = false;
@@ -315,7 +316,7 @@ function render() {
     const st = (has, m, n) => has ? `${n} ${m ? "mastered it" : "has it"}` : `${n} doesn't have it`;
     const who = `${st(hk, ck, "Mam")}, ${st(hj, cj, "Pap")}`;
     c.el.setAttribute("aria-label", `${c.label}: ${who}`);
-    const pass = show === "k" ? hk && !hj : show === "j" ? hj && !hk : show === "notgold" ? !(hk && hj) : true;
+    const pass = show === "none" ? !hk && !hj : show === "k" ? hk && !hj : show === "j" ? hj && !hk : show === "notgold" ? !(hk && hj) : true;
     const visible = pass && (!qq || c.name.includes(qq));
     c.el.hidden = !visible;
     if (visible) shown++;
