@@ -1,0 +1,346 @@
+<title>Sprite Stash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
+<style>
+/* Layout: fortnite.gg-style tracker. Centered stat header, sticky filter bar, flat grid of art-over-name cards. Single dark look. */
+:root {
+  color-scheme: dark;
+  --bg: #2f3136;
+  --panel: #1f2125;
+  --card: rgba(0, 0, 0, 0.3);
+  --line: #45484f;
+  --fg: #ffffff;
+  --muted: #a3a7ad;
+  --kylie: #ff4fa3;
+  --kylie-deep: #9c1b5c;
+  --jerry: #2f9bff;
+  --jerry-deep: #134f8f;
+  --gold: #ffc531;
+  --gold-deep: #9a6a00;
+  --rare: #104273;
+  --epic: #4d1566;
+  --legendary: #743e0a;
+  --mythic: #a89442;
+  --v-gold: #8f6d07;
+  --v-cheat: #1c6a22;
+  --v-hacker: #5a1c9c;
+  --v-reaper: #9b2a9e;
+  --v-treat: #a8480f;
+  --display: "Anton", "Impact", "Arial Narrow", sans-serif;
+  --body: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 14px/1.4 var(--body);
+  padding-inline: 16px;
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; }
+
+header.top {
+  margin-top: 20px; padding: 26px 16px 20px; border-radius: 10px; text-align: center;
+  background:
+    radial-gradient(600px 220px at 50% 0%, rgba(47, 155, 255, 0.22), transparent 70%),
+    radial-gradient(500px 200px at 20% 100%, rgba(255, 79, 163, 0.18), transparent 70%),
+    radial-gradient(500px 200px at 80% 100%, rgba(255, 197, 49, 0.14), transparent 70%),
+    var(--panel);
+}
+h1 { font: 400 clamp(30px, 6vw, 44px)/1 var(--display); text-transform: uppercase; margin: 0; letter-spacing: 0.5px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 6px 0 16px; font-size: 13px; }
+.tally { display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.tally div { background: rgba(0, 0, 0, 0.35); border-radius: 6px; padding: 8px 14px; min-width: 92px; }
+.tally b { display: block; font: 400 22px/1 var(--display); font-variant-numeric: tabular-nums; }
+.tally b small { font-size: 13px; color: var(--muted); }
+.tally span { display: block; margin-top: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; }
+.tally em { display: block; font-style: normal; font-size: 11px; color: var(--muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.tally .tk b { color: var(--kylie); } .tally .tj b { color: var(--jerry); } .tally .tg b { color: var(--gold); }
+
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  margin-inline: -16px; padding: 12px 16px;
+  display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: center;
+}
+.who { display: flex; align-items: center; gap: 8px; }
+.lbl { font: 400 14px var(--display); text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.seg { display: inline-flex; background: var(--panel); border-radius: 6px; padding: 3px; gap: 2px; }
+.seg button {
+  font: 400 15px/1 var(--display); text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--muted); background: transparent; border: 0; border-radius: 4px; padding: 8px 14px; cursor: pointer;
+}
+#asKylie[aria-pressed="true"] { background: var(--kylie); color: #fff; }
+#asJerry[aria-pressed="true"] { background: var(--jerry); color: #fff; }
+.seg.view button[aria-pressed="true"] { background: var(--line); color: #fff; }
+input[type="search"] {
+  flex: 0 1 260px; min-width: 0; font: 14px var(--body); color: var(--fg);
+  background: var(--panel); border: 0; border-radius: 6px; padding: 10px 14px;
+}
+input[type="search"]::placeholder { color: var(--muted); text-transform: uppercase; font-family: var(--display); letter-spacing: 0.04em; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font: 400 14px var(--display); text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer; user-select: none; background: var(--panel); padding: 9px 12px; border-radius: 6px; }
+.toggle input { width: 16px; height: 16px; margin: 0; accent-color: var(--gold); }
+.status-row { display: flex; justify-content: center; gap: 6px 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+.status-row .crown { display: inline-block; width: 15px; height: 10px; margin-right: 5px; background: url("crown.webp") center / contain no-repeat; }
+.status-row i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 5px; }
+#status.err { color: #ff8a8a; }
+
+button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.card {
+  display: flex; flex-direction: column; text-align: left; overflow: hidden;
+  background: var(--card); border: 0; border-radius: 8px; padding: 0; cursor: pointer;
+  color: var(--fg); font: inherit; box-shadow: inset 0 0 0 2px transparent;
+  transition: background-color .2s ease, box-shadow .2s ease, transform .12s ease;
+}
+.card:hover { transform: translateY(-2px); }
+.card:active { transform: scale(0.97); }
+.art { aspect-ratio: 1; max-width: 100%; background-image: linear-gradient(var(--tint) 0, transparent 100%); }
+.art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.t-rare { --tint: var(--rare); } .t-epic { --tint: var(--epic); } .t-legendary { --tint: var(--legendary); } .t-mythic { --tint: var(--mythic); }
+.t-gold { --tint: var(--v-gold); } .t-cheatmaster { --tint: var(--v-cheat); } .t-hacker { --tint: var(--v-hacker); }
+.t-reaper { --tint: var(--v-reaper); } .t-tricktreat { --tint: var(--v-treat); }
+.info { padding: 6px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+.nm { font-weight: 700; font-size: 15px; line-height: 1.2; overflow-wrap: anywhere; }
+.tags { display: flex; gap: 10px; font-size: 12px; color: var(--muted); }
+.tag { display: inline-flex; align-items: center; gap: 5px; }
+.tag::before { content: ""; width: 13px; height: 13px; border-radius: 3px; border: 1.5px solid currentColor; opacity: 0.7; }
+.tag.on { color: #fff; font-weight: 700; }
+.tag { position: relative; }
+.tag.m::after {
+  content: ""; position: absolute; left: 12px; transform: translateX(-50%); top: -8px; width: 19px; height: 13px;
+  background: url("crown.webp") center / contain no-repeat; filter: drop-shadow(0 0 2px #000);
+}
+.tag.on::before { opacity: 1; border-color: #fff;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px no-repeat; }
+
+.card.own-k { background: linear-gradient(180deg, var(--kylie-deep), var(--kylie)); box-shadow: inset 0 0 0 2px var(--kylie); }
+.card.own-j { background: linear-gradient(180deg, var(--jerry-deep), var(--jerry)); box-shadow: inset 0 0 0 2px var(--jerry); }
+.card.own-both { background: linear-gradient(180deg, var(--gold-deep), var(--gold)); box-shadow: inset 0 0 0 2px var(--gold); }
+.card.own-both .nm, .card.own-both .tag.on { color: #241600; }
+.card.own-both .tag.on::before { border-color: #241600;
+  background: #241600 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='%23ffc531' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px no-repeat; }
+.grid.compact { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.grid.compact .info { padding: 4px 8px 9px; gap: 7px; }
+.grid.compact .nm { font-size: 12px; }
+.grid.compact .tags { flex-direction: column; gap: 11px; font-size: 11px; }
+.grid.compact .tags { margin-top: 4px; }
+.grid.compact .tag.m::after { top: -6px; width: 16px; height: 10px; }
+.card.pop { animation: pop .28s ease; }
+@keyframes pop { 50% { transform: scale(1.05); } }
+
+.empty { text-align: center; color: var(--muted); padding: 60px 16px; }
+.empty b { display: block; font: 400 26px var(--display); text-transform: uppercase; color: var(--fg); margin-bottom: 6px; }
+
+@media (max-width: 480px) {
+  .grid.compact { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+  .info { padding: 4px 8px 10px; }
+  .nm { font-size: 13px; }
+  .tags { gap: 8px; font-size: 11px; }
+  input[type="search"] { flex: 1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce) { .card, .card.pop { transition: none; animation: none; } .card:hover { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Kylie &amp; Jerry's Sprites</h1>
+    <p class="sub">Chapter 7 Season 4 · tap once if you have it, twice once you've mastered it, a third time to clear</p>
+    <div class="tally" aria-live="polite">
+      <div class="tk"><b><span id="cK">0</span> <small>/ <span class="cT">0</span></small></b><span>Kylie</span><em><span id="mK">0</span> mastered</em></div>
+      <div class="tj"><b><span id="cJ">0</span> <small>/ <span class="cT">0</span></small></b><span>Jerry</span><em><span id="mJ">0</span> mastered</em></div>
+      <div class="tg"><b><span id="cB">0</span> <small>/ <span class="cT">0</span></small></b><span>Both</span><em><span id="mB">0</span> mastered</em></div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="who">
+      <span class="lbl">I'm</span>
+      <div class="seg" role="group" aria-label="Who is tapping">
+        <button id="asKylie" type="button" aria-pressed="true">Kylie</button>
+        <button id="asJerry" type="button" aria-pressed="false">Jerry</button>
+      </div>
+    </div>
+    <input id="q" type="search" placeholder="Search" autocomplete="off" aria-label="Search sprites">
+    <div class="seg view" role="group" aria-label="Card size">
+      <button id="viewBig" type="button" aria-pressed="true">Big</button>
+      <button id="viewSmall" type="button" aria-pressed="false">Small</button>
+    </div>
+    <label class="toggle"><input id="hideBoth" type="checkbox"> Hide ones we both have</label>
+  </div>
+  <div class="status-row">
+    <span><i style="background:var(--kylie)"></i>Only Kylie</span>
+    <span><i style="background:var(--jerry)"></i>Only Jerry</span>
+    <span><i style="background:var(--gold)"></i>Both</span>
+    <span><span class="crown"></span>Mastered</span>
+    <span id="status">Connecting…</span>
+  </div>
+
+  <main>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" hidden><b>All caught up</b>No sprites match these filters.</div>
+  </main>
+</div>
+
+<script>
+// [id, name, rarity, variant] from fortnite.gg, Chapter 7 Season 4.
+const SPRITES = [[182,"Jonesy","rare","base"],[184,"Gold Jonesy","special","gold"],[183,"Cheat Master Jonesy","special","cheatmaster"],[110,"Loot Hacker Jonesy","special","hacker"],[209,"Bounty Hunter Jonesy","special","reaper"],[244,"Trick or Treat Jonesy","special","tricktreat"],[176,"Adventure","rare","base"],[178,"Gold Adventure","special","gold"],[177,"Cheat Master Adventure","special","cheatmaster"],[108,"Loot Hacker Adventure","special","hacker"],[207,"Bounty Hunter Adventure","special","reaper"],[242,"Trick or Treat Adventure","special","tricktreat"],[167,"Bush","rare","base"],[169,"Gold Bush","special","gold"],[168,"Cheat Master Bush","special","cheatmaster"],[105,"Loot Hacker Bushranger","special","hacker"],[205,"Bounty Hunter Bush","special","reaper"],[240,"Trick or Treat Bushranger","special","tricktreat"],[185,"Sonic","epic","base"],[187,"Gold Sonic","special","gold"],[186,"Cheat Master Sonic","special","cheatmaster"],[114,"Loot Hacker Sonic","special","hacker"],[210,"Bounty Hunter Sonic","special","reaper"],[245,"Trick or Treat Sonic","special","tricktreat"],[170,"Tails","epic","base"],[172,"Gold Tails","special","gold"],[171,"Cheat Master Tails","special","cheatmaster"],[103,"Loot Hacker Tails","special","hacker"],[203,"Bounty Hunter Tails","special","reaper"],[238,"Trick or Treat Tails","special","tricktreat"],[164,"Shadow","epic","base"],[166,"Gold Shadow","special","gold"],[165,"Cheat Master Shadow","special","cheatmaster"],[104,"Loot Hacker Shadow","special","hacker"],[204,"Bounty Hunter Shadow","special","reaper"],[239,"Trick or Treat Shadow","special","tricktreat"],[191,"8-Bit","rare","base"],[193,"Gold 8-Bit","special","gold"],[192,"Cheat Master 8-Bit","special","cheatmaster"],[117,"Loot Hacker 8-Bit","special","hacker"],[212,"Bounty Hunter 8-Bit","special","reaper"],[246,"Trick or Treat 8-Bit","special","tricktreat"],[161,"Jackrabbit","legendary","base"],[162,"Gold Jackrabbit","special","gold"],[163,"Cheat Master Jackrabbit","special","cheatmaster"],[102,"Loot Hacker Jackrabbit","special","hacker"],[119,"Bounty Hunter Jackrabbit","special","reaper"],[225,"Trick or Treat Jackrabbit","special","tricktreat"],[188,"Crown","mythic","base"],[190,"Gold Crown","special","gold"],[189,"Cheat Master Crown","special","cheatmaster"],[115,"Loot Hacker Crown","special","hacker"],[211,"Bounty Hunter Crown","special","reaper"],[243,"Trick or Treat Crown","special","tricktreat"],[173,"Killswitch","legendary","base"],[175,"Gold Killswitch","special","gold"],[174,"Cheat Master Killswitch","special","cheatmaster"],[107,"Loot Hacker Killswitch","special","hacker"],[206,"Bounty Hunter Killswitch","special","reaper"],[241,"Trick or Treat Killswitch","special","tricktreat"],[179,"Klombo","mythic","base"],[181,"Gold Klombo","special","gold"],[180,"Cheat Master Klombo","special","cheatmaster"],[109,"Loot Hacker Klombo","special","hacker"],[208,"Bounty Hunter Klombo","special","reaper"],[262,"Trick or Treat Klombo","special","tricktreat"],[92,"Mega Man","rare","base"],[83,"Overshield","rare","base"],[88,"Gold Overshield","special","gold"],[85,"Cheat Master Overshield","special","cheatmaster"],[91,"Loot Hacker Overshield","special","hacker"],[125,"Bounty Hunter Overshield","special","reaper"],[233,"Trick or Treat Overshield","special","tricktreat"],[93,"X-Ray","legendary","base"],[95,"Gold X-Ray","special","gold"],[94,"Cheatmaster X-Ray","special","cheatmaster"],[96,"Loot Hacker X-Ray","special","hacker"],[201,"Bounty Hunter X-Ray","special","reaper"],[237,"Trick or Treat X-Ray","special","tricktreat"],[97,"Onigiri","rare","base"],[100,"Gold Onigiri","special","gold"],[98,"Cheatmaster Onigiri","special","cheatmaster"],[101,"Loot Hacker Onigiri","special","hacker"],[202,"Bounty Hunter Onigiri","special","reaper"],[255,"Trick or Treat Onigiri","special","tricktreat"],[194,"Storm Scout","rare","base"],[196,"Gold Storm Scout","special","gold"],[195,"Cheat Master Storm Scout","special","cheatmaster"],[118,"Loot Hacker Storm Scout","special","hacker"],[218,"Bounty Hunter Storm Scout","special","reaper"],[247,"Trick or Treat Storm Scout","special","tricktreat"],[120,"Blinky","legendary","base"],[122,"Gold Blinky","special","gold"],[121,"Cheat Master Blinky","special","cheatmaster"],[123,"Loot Hacker Blinky","special","hacker"],[124,"Bounty Hunter Blinky","special","reaper"],[232,"Trick or Treat Blinky","special","tricktreat"],[127,"Birthday","rare","base"],[131,"Gold Birthday","special","gold"],[132,"Cheat Master Birthday","special","cheatmaster"],[133,"Loot Hacker Birthday","special","hacker"],[134,"Bounty Hunter Birthday","special","reaper"],[234,"Trick or Treat Birthday","special","tricktreat"],[135,"Crash Bandicoot","legendary","base"],[137,"Gold Crash Bandicoot","special","gold"],[136,"Cheat Master Crash Bandicoot","special","cheatmaster"],[143,"Loot Hacker Crash Bandicoot","special","hacker"],[144,"Bounty Hunter Crash Bandicoot","special","reaper"],[235,"Trick or Treat Crash Bandicoot","special","tricktreat"],[147,"Pond","epic","base"],[198,"Gold Pond","special","gold"],[197,"Cheat Master Pond","special","cheatmaster"],[199,"Loot Hacker Pond","special","hacker"],[200,"Bounty Hunter Pond","special","reaper"],[236,"Trick or Treat Pond","special","tricktreat"],[213,"Morgana","epic","base"],[215,"Gold Morgana","special","gold"],[214,"Cheat Master Morgana","special","cheatmaster"],[216,"Loot Hacker Morgana","special","hacker"],[217,"Bounty Hunter Morgana","special","reaper"],[248,"Trick or Treat Morgana","special","tricktreat"],[219,"Spooky Dash","mythic","base"],[221,"Gold Spooky Dash","special","gold"],[220,"Cheat Master Spooky Dash","special","cheatmaster"],[222,"Loot Hacker Spooky Dash","special","hacker"],[223,"Bounty Hunter Spooky Dash","special","reaper"],[224,"Trick or Treat Spooky Dash","special","tricktreat"],[226,"Vampire","legendary","base"],[228,"Gold Vampire","special","gold"],[227,"Cheatmaster Vampire","special","cheatmaster"],[229,"Loot Hacker Vampire","special","hacker"],[230,"Bounty Hunter Vampire","special","reaper"],[231,"Trick or Treat Vampire","special","tricktreat"],[249,"The Deer","legendary","base"],[251,"Gold The Deer","special","gold"],[250,"Cheatmaster The Deer","special","cheatmaster"],[252,"Loot Hacker The Deer","special","hacker"],[253,"Bounty Hunter The Deer","special","reaper"],[254,"Trick or Treat The Deer","special","tricktreat"],[256,"Dumpster Dive","epic","base"],[258,"Gold Dumpster Dive","special","gold"],[257,"Cheat Master Dumpster Dive","special","cheatmaster"],[259,"Loot Hacker Dumpster Dive","special","hacker"],[260,"Bounty Hunter Dumpster Dive","special","reaper"],[261,"Trick or Treat Dumpster Dive","special","tricktreat"]];
+
+// own[id] = { k, j: owned; km, jm: mastered (mastered implies owned) }
+let own = {};
+let me = "k";
+let hideBoth = false;
+let query = "";
+let stateRef = null;
+let canWrite = true;
+let writing = Promise.resolve();
+
+try { const saved = localStorage.getItem("sprite-stash-me"); if (saved === "k" || saved === "j") me = saved; } catch (e) {}
+try { hideBoth = localStorage.getItem("sprite-stash-hide") === "1"; } catch (e) {}
+let compact = false;
+try { compact = localStorage.getItem("sprite-stash-view") === "small"; } catch (e) {}
+document.getElementById("hideBoth").checked = hideBoth;
+
+const grid = document.getElementById("grid");
+const cards = [];
+for (const [id, name, rarity, variant] of SPRITES) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "card";
+  b.innerHTML = `<div class="art"><img loading="lazy" decoding="async" alt="" width="160" height="160"></div><div class="info"><div class="nm"></div><div class="tags"><span class="tag k">Kylie</span><span class="tag j">Jerry</span></div></div>`;
+  b.querySelector(".art").classList.add("t-" + (variant === "base" ? rarity : variant));
+  b.querySelector("img").src = "img/" + id + ".webp";
+  b.querySelector(".nm").textContent = name;
+  b.addEventListener("click", () => tap(id, b));
+  grid.appendChild(b);
+  cards.push({ id, name: name.toLowerCase(), label: name, el: b, tk: b.querySelector(".tag.k"), tj: b.querySelector(".tag.j") });
+}
+document.querySelectorAll(".cT").forEach(e => e.textContent = SPRITES.length);
+
+function render() {
+  let k = 0, j = 0, both = 0, mk = 0, mj = 0, mb = 0, shown = 0;
+  const qq = query.trim().toLowerCase();
+  for (const c of cards) {
+    const o = own[c.id] || {};
+    const hk = !!o.k, hj = !!o.j;
+    const ck = hk && !!o.km, cj = hj && !!o.jm;
+    if (hk) k++; if (hj) j++; if (hk && hj) both++;
+    if (ck) mk++; if (cj) mj++; if (ck && cj) mb++;
+    c.el.classList.toggle("own-k", hk && !hj);
+    c.el.classList.toggle("own-j", hj && !hk);
+    c.el.classList.toggle("own-both", hk && hj);
+    c.tk.classList.toggle("on", hk);
+    c.tj.classList.toggle("on", hj);
+    c.tk.classList.toggle("m", ck);
+    c.tj.classList.toggle("m", cj);
+    const st = (has, m, n) => has ? `${n} ${m ? "mastered it" : "has it"}` : `${n} doesn't have it`;
+    const who = `${st(hk, ck, "Kylie")}, ${st(hj, cj, "Jerry")}`;
+    c.el.setAttribute("aria-label", `${c.label}: ${who}`);
+    const show = !(hideBoth && hk && hj) && (!qq || c.name.includes(qq));
+    c.el.hidden = !show;
+    if (show) shown++;
+  }
+  document.getElementById("empty").hidden = shown > 0;
+  document.getElementById("cK").textContent = k;
+  document.getElementById("cJ").textContent = j;
+  document.getElementById("cB").textContent = both;
+  document.getElementById("mK").textContent = mk;
+  document.getElementById("mJ").textContent = mj;
+  document.getElementById("mB").textContent = mb;
+}
+
+function setStatus(text, err) {
+  const s = document.getElementById("status");
+  s.textContent = text;
+  s.classList.toggle("err", !!err);
+}
+
+const NO_EDIT = "You can look but not edit. Ask Kylie to share it with you as a Contributor.";
+
+function tap(id, el) {
+  if (!stateRef) { setStatus("Still connecting. Try again in a second.", true); return; }
+  if (!canWrite) { setStatus(NO_EDIT, true); return; }
+  // Each person cycles: not owned -> owned -> mastered -> not owned.
+  const cur = own[id] || {};
+  const m = me + "m";
+  const has = !!cur[me], mastered = has && !!cur[m];
+  const mine = !has ? { [me]: true, [m]: false } : !mastered ? { [me]: true, [m]: true } : { [me]: false, [m]: false };
+  own = { ...own, [id]: { ...cur, ...mine } };
+  render();
+  el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+  // Merge only this person's flag, so Kylie's and Jerry's taps never overwrite each other.
+  const patch = { own: { [id]: mine } };
+  writing = writing.then(() => save(patch)).catch(() => {});
+}
+
+async function save(patch) {
+  setStatus("Saving…");
+  try {
+    await stateRef.update(patch);
+    setStatus("Saved");
+  } catch (e) {
+    if (e && e.code === "invalid_argument") {
+      // update() needs the doc to exist; create it on the very first tap.
+      try { await stateRef.set(patch); setStatus("Saved"); return; }
+      catch (e2) { canWrite = false; setStatus(NO_EDIT, true); return; }
+    }
+    if (e && e.code === "unavailable") {
+      await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
+      try { await stateRef.update(patch); setStatus("Saved"); return; } catch (e3) {}
+    }
+    setStatus("Couldn't save that tap. Check your connection and tap it again.", true);
+  }
+}
+
+function setMe(who) {
+  me = who;
+  document.getElementById("asKylie").setAttribute("aria-pressed", String(me === "k"));
+  document.getElementById("asJerry").setAttribute("aria-pressed", String(me === "j"));
+  try { localStorage.setItem("sprite-stash-me", me); } catch (e) {}
+}
+document.getElementById("asKylie").addEventListener("click", () => setMe("k"));
+document.getElementById("asJerry").addEventListener("click", () => setMe("j"));
+setMe(me);
+
+function setView(small) {
+  compact = small;
+  grid.classList.toggle("compact", compact);
+  document.getElementById("viewBig").setAttribute("aria-pressed", String(!compact));
+  document.getElementById("viewSmall").setAttribute("aria-pressed", String(compact));
+  try { localStorage.setItem("sprite-stash-view", compact ? "small" : "big"); } catch (e) {}
+}
+document.getElementById("viewBig").addEventListener("click", () => setView(false));
+document.getElementById("viewSmall").addEventListener("click", () => setView(true));
+setView(compact);
+
+document.getElementById("hideBoth").addEventListener("change", e => {
+  hideBoth = e.target.checked;
+  try { localStorage.setItem("sprite-stash-hide", hideBoth ? "1" : "0"); } catch (err) {}
+  render();
+});
+let qt;
+document.getElementById("q").addEventListener("input", e => {
+  clearTimeout(qt);
+  qt = setTimeout(() => { query = e.target.value; render(); }, 120);
+});
+
+render();
+
+(async () => {
+  const db = window.claude ? await window.claude.use("db") : null;
+  if (!db) { setStatus("Open this on claude.ai while signed in to save taps.", true); return; }
+  stateRef = db.doc("stash/state");
+  stateRef.onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : null;
+    own = (d && d.own) || {};
+    render();
+    if (!snap.metadata.hasPendingWrites) setStatus(snap.metadata.fromCache ? "Syncing…" : "Live");
+  }, () => {
+    setStatus("Lost the live connection. Reload the page to reconnect.", true);
+  });
+})();
+</script>
