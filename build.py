@@ -40,11 +40,11 @@ img { max-width: 100%; }
   position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px;
   background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
-.login form { width: min(360px, 100%); background: var(--panel); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
-.login h2 { font: 400 26px/1 var(--display); text-transform: uppercase; margin: 0; }
+.login form { width: min(360px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 12px; }
+.login h2 { font: 700 24px/1.1 var(--font); letter-spacing: -0.03em; margin: 0; }
 .login p { margin: 0; color: var(--muted); font-size: 13px; }
-.login input { font: 15px var(--body); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
-.login button { font: 400 17px/1 var(--display); text-transform: uppercase; letter-spacing: 0.04em; background: var(--gold); color: #241600; border: 0; border-radius: 6px; padding: 12px; cursor: pointer; }
+.login input { font: 15px var(--font); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.login button { font: 600 15px/1 var(--font); background: var(--fg); color: var(--bg); border: 0; border-radius: 10px; padding: 12px; cursor: pointer; }
 .login .err { color: #ff8a8a; min-height: 1em; }
 .signout { background: none; border: 0; color: var(--muted); font: inherit; text-decoration: underline; cursor: pointer; padding: 0; }
 </style>''')
