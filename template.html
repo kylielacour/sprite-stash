@@ -175,7 +175,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--jerry); out
     <div class="tally" aria-live="polite">
       <div class="stat tk"><div class="lab">Mam</div><div class="num"><span id="cK">0</span><small>/<span class="cT">0</span></small></div><div class="sm"><span id="mK">0</span> mastered</div></div>
       <div class="stat tj"><div class="lab">Pap</div><div class="num"><span id="cJ">0</span><small>/<span class="cT">0</span></small></div><div class="sm"><span id="mJ">0</span> mastered</div></div>
-      <div class="stat tg"><div class="lab">Both</div><div class="num"><span id="cB">0</span><small>/<span class="cT">0</span></small></div><div class="sm"><span id="mB">0</span> mastered</div></div>
+      <div class="stat tg"><div class="lab">Together</div><div class="num"><span id="cB">0</span><small>/<span class="cT">0</span></small></div><div class="sm"><span id="mB">0</span> mastered</div></div>
     </div>
   </header>
 
@@ -259,14 +259,14 @@ for (const [id, name, rarity, variant] of SPRITES) {
 document.querySelectorAll(".cT").forEach(e => e.textContent = SPRITES.length);
 
 function render() {
-  let k = 0, j = 0, both = 0, mk = 0, mj = 0, mb = 0, shown = 0;
+  let k = 0, j = 0, together = 0, mk = 0, mj = 0, mt = 0, shown = 0;
   const qq = query.trim().toLowerCase();
   for (const c of cards) {
     const o = own[c.id] || {};
     const hk = !!o.k, hj = !!o.j;
     const ck = hk && !!o.km, cj = hj && !!o.jm;
-    if (hk) k++; if (hj) j++; if (hk && hj) both++;
-    if (ck) mk++; if (cj) mj++; if (ck && cj) mb++;
+    if (hk) k++; if (hj) j++; if (hk || hj) together++;
+    if (ck) mk++; if (cj) mj++; if (ck || cj) mt++;
     c.el.classList.toggle("own-k", hk && !hj);
     c.el.classList.toggle("own-j", hj && !hk);
     c.el.classList.toggle("own-both", hk && hj);
@@ -285,10 +285,10 @@ function render() {
   document.getElementById("empty").hidden = shown > 0;
   document.getElementById("cK").textContent = k;
   document.getElementById("cJ").textContent = j;
-  document.getElementById("cB").textContent = both;
+  document.getElementById("cB").textContent = together;
   document.getElementById("mK").textContent = mk;
   document.getElementById("mJ").textContent = mj;
-  document.getElementById("mB").textContent = mb;
+  document.getElementById("mB").textContent = mt;
 }
 
 function setStatus(text, err) {
